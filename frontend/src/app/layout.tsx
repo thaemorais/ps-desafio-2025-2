@@ -1,13 +1,14 @@
 import type { Metadata } from 'next'
-import { Arimo } from 'next/font/google'
+import { Roboto } from 'next/font/google'
 import '@/app/globals.css'
 import { Providers } from '@/providers/providers'
 import { Toaster as SonnerToaster } from '@/components/sonner'
 import { Toaster } from '@/components/toaster'
-import '@fortawesome/fontawesome-svg-core/styles.css'
-import './fontawesome'
 
-const arimo = Arimo({ subsets: ['latin'] })
+const roboto = Roboto({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '700'],
+})
 
 export const metadata: Metadata = {
   title: 'Adapti Project Template',
@@ -21,7 +22,7 @@ export default async function RootLayout({
 }>) {
   return (
     <html lang="pt-BR">
-      <body className={arimo.className}>
+      <body className={roboto.className}>
         <Providers>
           {children}
           <SonnerToaster />
