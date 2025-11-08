@@ -4,12 +4,14 @@ import '@/app/globals.css'
 import { Providers } from '@/providers/providers'
 import { Toaster as SonnerToaster } from '@/components/sonner'
 import { Toaster } from '@/components/toaster'
+import '@fortawesome/fontawesome-svg-core/styles.css'
+import './fontawesome'
 
 const arimo = Arimo({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'Adapti Project Template',
-  description: 'Created by Adapti 2024',
+  description: 'Created by Adapti 2025',
 }
 
 export default async function RootLayout({
