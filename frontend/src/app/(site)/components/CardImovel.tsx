@@ -1,20 +1,48 @@
-import { BsChevronRight } from "react-icons/bs";
-import styled from "styled-components";
+import Link from 'next/link'
+import { BsChevronRight } from 'react-icons/bs'
+import styled from 'styled-components'
 
-export default function CardImovel() {
-    return (
-        <CardImovelContainer>
-            <CardImovelImage backgroundImage="https://picsum.photos/250/500">
-                <CardImovelContent>
-                    <h4>Categoria</h4>
-                    <h3>Nome do imovel</h3>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec quis tortor finibus, venenatis metus laoreet, aliquam tellus. Suspendisse potenti. Duis lacinia sollicitudin sapien eget laoreet. Integer sem sapien, egestas in odio a, auctor sagittis lacus. Donec ac orci vitae dolor consectetur pulvinar. Praesent quis nunc sed dui malesuada cursus id in quam. Pellentesque suscipit orci ut risus tristique facilisis. Nam non massa iaculis, gravida lectus at, pretium mi. Aenean at efficitur augue, vel ultricies diam.</p>
-                    <a>Ver detalhes<BsChevronRight size={20} /></a>
-                </CardImovelContent>
-            </CardImovelImage>
-        </CardImovelContainer>
-    )
+import { propertyType } from '@/types/property'
+
+type CardImovelProps = {
+  property: propertyType
 }
+
+export default function CardImovel({ property }: CardImovelProps) {
+  const image = property.imagem ?? 'https://via.placeholder.com/600x800?text=Im%C3%B3vel'
+
+  return (
+    <CardImovelContainer>
+      <CardImovelImage backgroundImage={image}>
+        <CardImovelContent>
+          <FlexCenterBetween>
+              <h4>{property.categoria.nome}</h4>
+            <StatusBadge adquirido={property.adquirido}>
+              {property.adquirido ? 'Adquirido' : 'Disponível'}
+            </StatusBadge>
+          </FlexCenterBetween>
+          <h3>{property.titulo}</h3>
+            {property.descricao && <p>{property.descricao}</p>}
+          <div>
+            <Link href={`/${property.id}`}>
+              Ver detalhes
+              <BsChevronRight size={20} />
+            </Link>
+          </div>
+        </CardImovelContent>
+      </CardImovelImage>
+    </CardImovelContainer>
+  )
+}
+
+const FlexCenterBetween = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+`;
+
 const CardImovelContainer = styled.div`
     width: 100%;
     height: 500px;
@@ -50,6 +78,13 @@ const CardImovelContent = styled.div`
     padding: 10px 20px 20px;
     position: relative;
 
+    > ${FlexCenterBetween} {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      z-index: 1;
+    }
+
     h4 {
         font-size: 1rem;
         font-weight: 400;
@@ -57,9 +92,7 @@ const CardImovelContent = styled.div`
         text-transform: uppercase;
         padding: 6px 16px;
         border-radius: 999px;
-        position: absolute;
-        top: 20px;
-        left: 20px;
+        
         min-width: fit-content;
         display: flex;
         align-items: center;
@@ -78,10 +111,15 @@ const CardImovelContent = styled.div`
         font-weight: 400;
         color: #fff;
         display: -webkit-box;
-        -webkit-line-clamp: 3;
+        -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
         text-overflow: ellipsis;
+    }
+    small {
+        font-size: 0.9rem;
+        color: #f0f0f0;
+        opacity: 0.85;
     }
     div {
         display: flex;
@@ -132,4 +170,16 @@ const CardImovelContent = styled.div`
             left: 0;
         }
     }
+`;
+
+const StatusBadge = styled.span<{ adquirido: boolean }>`
+    font-size: 0.875rem;
+    font-weight: 600;
+    width: fit-content;
+    padding: 6px 16px;
+    border-radius: 999px;
+    background-color: ${({ adquirido }) => (adquirido ? 'rgba(229, 57, 53, 0.7)' : 'rgba(76, 175, 80, 0.7)')};
+    color: #fff;
+    margin-bottom: auto;
+    align-self: flex-end;
 `;
