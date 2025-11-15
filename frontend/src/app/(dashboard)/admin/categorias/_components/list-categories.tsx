@@ -16,9 +16,10 @@ import { DialogUpdateCategory } from './dialog-update-category'
 import { DialogCategoryDelete } from './dialog-delete-category'
 import { DialogInformationCategory } from './dialog-information-category'
 import { DialogCreateCategory } from './dialog-create-category'
+import { api } from '@/services/api'
 
 export default async function ListCategory() {
-  const { response } = null // requisicao para api
+  const { response } = await api<categoryType[]>('GET', '/categories')
 
   if (!response) {
     return (

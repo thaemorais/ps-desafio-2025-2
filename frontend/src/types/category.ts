@@ -1,6 +1,7 @@
 export type Category = {
   id: string
-  nome: string
+  name: string
 }
 
 export type CategoryType = Category
+export type categoryType = Category

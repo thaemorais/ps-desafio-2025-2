@@ -14,7 +14,8 @@ import { filterFormData } from '@/services/filter-form-data'
 import { useEffect, useState } from 'react'
 import { useToast } from '@/components/use-toast'
 import { categoryType } from '@/types/category'
-import { ResponseErrorType, api } from '@/services/api'
+import { ResponseErrorType } from '@/services/api'
+import { getCategory } from '@/actions/category'
 
 interface DialogUpdateCategoryProps {
   id: string
@@ -26,23 +27,28 @@ export function DialogUpdateCategory({
   children,
 }: DialogUpdateCategoryProps) {
   const [category, setCategory] = useState<categoryType | null>(null)
-  const [open, setOpen] = useState<boolean>()
+  const [open, setOpen] = useState<boolean>(false)
   const [error, setError] = useState<ResponseErrorType | null>(null)
   const { toast } = useToast()
 
   useEffect(() => {
+    if (!open) {
+      return
+    }
+
     const requestData = async () => {
-      const { response } = null // requisicao para api
+      setCategory(null)
+      const { response, error } = await getCategory(id)
 
       if (response) {
         setCategory(response)
-      } else {
-        setCategory(null)
-        toast({
-          title: 'Categoria  não encontrada!',
-        })
-        setOpen(false)
+        return
       }
+
+      toast({
+        title: error?.message ?? 'Categoria não encontrada!',
+      })
+      setOpen(false)
     }
 
     requestData()
@@ -56,7 +62,7 @@ export function DialogUpdateCategory({
   const submit = async (form: FormData) => {
     const newForm = await filterFormData(form)
 
-    const { error } = await JSON.parse(await updateCategory(newForm))
+    const { error } = await updateCategory(id, newForm)
 
     if (error) {
       setError(error)

@@ -1,57 +1,95 @@
 import Image from "next/image";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import styled from "styled-components";
-import Swiper from "swiper";
-import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
+import type { Swiper as SwiperType } from "swiper";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 
 export default function CarrosselHero() {
-    const swiper = new Swiper('.swiper', {
+  const swiperInstanceRef = useRef<SwiperType | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function mountSwiper() {
+      if (typeof window === "undefined" || !isMounted) {
+        return;
+      }
+
+      const { default: Swiper } = await import("swiper");
+
+      swiperInstanceRef.current = new Swiper(".swiper", {
         pagination: {
-          el: '.swiper-pagination',
+          el: ".swiper-pagination",
         },
         navigation: {
-          nextEl: '.swiper-button-next',
-          prevEl: '.swiper-button-prev',
+          nextEl: ".swiper-button-next",
+          prevEl: ".swiper-button-prev",
         },
         scrollbar: {
-          el: '.swiper-scrollbar',
+          el: ".swiper-scrollbar",
         },
         autoplay: {
           delay: 2500,
           disableOnInteraction: true,
         },
       });
-    
-      useEffect(() => {
-        swiper.init();
-      }, []);
+    }
 
-    return (
-        <SliderContainer>
-          <StyledSwiper className="swiper">
-            <div className="swiper-wrapper">
-              <div className="swiper-slide">
-                <Image src="https://picsum.photos/1920/1080" alt="Slider 1" width={1920} height={1080} />
-              </div>
-              <div className="swiper-slide">
-                <Image src="https://picsum.photos/1920/1080" alt="Slider 2" width={1920} height={1080} />
-              </div>
-              <div className="swiper-slide">
-                <Image src="https://picsum.photos/1920/1080" alt="Slider 3" width={1920} height={1080} />
-              </div>
-              <div className="swiper-slide">
-                <Image src="https://picsum.photos/1920/1080" alt="Slider 4" width={1920} height={1080} />
-              </div>
-            </div>
-            <div className="swiper-pagination"></div>
+    mountSwiper();
 
-            <div className="swiper-button-prev"></div>
-            <div className="swiper-button-next"></div>
-          </StyledSwiper>
-        </SliderContainer>
-    )
+    return () => {
+      isMounted = false;
+      swiperInstanceRef.current?.destroy(true, true);
+      swiperInstanceRef.current = null;
+    };
+  }, []);
+
+  return (
+    <SliderContainer>
+      <StyledSwiper className="swiper">
+        <div className="swiper-wrapper">
+          <div className="swiper-slide">
+            <Image
+              src="https://picsum.photos/1920/1080"
+              alt="Slider 1"
+              width={1920}
+              height={1080}
+            />
+          </div>
+          <div className="swiper-slide">
+            <Image
+              src="https://picsum.photos/1920/1080"
+              alt="Slider 2"
+              width={1920}
+              height={1080}
+            />
+          </div>
+          <div className="swiper-slide">
+            <Image
+              src="https://picsum.photos/1920/1080"
+              alt="Slider 3"
+              width={1920}
+              height={1080}
+            />
+          </div>
+          <div className="swiper-slide">
+            <Image
+              src="https://picsum.photos/1920/1080"
+              alt="Slider 4"
+              width={1920}
+              height={1080}
+            />
+          </div>
+        </div>
+        <div className="swiper-pagination"></div>
+
+        <div className="swiper-button-prev"></div>
+        <div className="swiper-button-next"></div>
+      </StyledSwiper>
+    </SliderContainer>
+  );
 }
 
 const SliderContainer = styled.section`

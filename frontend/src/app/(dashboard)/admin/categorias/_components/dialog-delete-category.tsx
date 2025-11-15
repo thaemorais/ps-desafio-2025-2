@@ -27,7 +27,7 @@ export function DialogCategoryDelete({
   const { toast } = useToast()
 
   const submit = async () => {
-    const { error } = await JSON.parse(await destroyCategory(id))
+    const { error } = await destroyCategory(id)
 
     if (error) {
       toast({

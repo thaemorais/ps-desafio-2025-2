@@ -33,7 +33,7 @@ export function DialogCreateCategory({ children }: DialogCreateCategoryProps) {
   const submit = async (form: FormData) => {
     const newForm = await filterFormData(form)
 
-    const { error } = await JSON.parse(await createCategory(newForm))
+    const { error } = await createCategory(newForm)
 
     if (error) {
       setError(error)

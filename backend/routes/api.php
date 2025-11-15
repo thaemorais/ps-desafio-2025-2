@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CategoriesController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,6 +16,25 @@ Route::middleware(['auth:sanctum'])->group(function () {
 Route::middleware(['auth:sanctum', 'can:admin'])->group(function () {
     Route::apiResource('/users', UserController::class);
 });
+
+Route::middleware(['auth:sanctum'])->group(function () {
+});
+
+// POST - Cria um novo registro na tabela categories
+Route::post('/categories', [CategoriesController::class, 'store']);
+// GET - Retorna todos os registros da tabela categories
+Route::get('/categories', [CategoriesController::class, 'index']);
+// GET - Retorna um registro específico da tabela categories
+Route::get('/categories/{id}', [CategoriesController::class, 'show']);
+// PUT - Atualiza um registro específico da tabela categories
+Route::put('/categories/{id}', [CategoriesController::class, 'update']);
+// DELETE - Remove um registro específico da tabela categories
+Route::delete('/categories/{id}', [CategoriesController::class, 'destroy']);
+
+
+// API Resource - Retorna todas as rotas da tabela categories
+// Route::apiResource('/categories', CategoriesController::class);
+
 
 Route::get('/', function () {
     return ['Laravel' => app()->version()];

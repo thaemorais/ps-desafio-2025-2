@@ -92,10 +92,9 @@ export async function api<T = unknown>(
     })
     return { response: response as T, error: undefined }
   } catch (e) {
-    if (
-      (e as ResponseErrorType).status === 401 ||
-      (e as ResponseErrorType).status === 403
-    ) {
+    const error = e as ResponseErrorType
+
+    if (error.status === 401 || error.status === 403) {
       if (isServerSide()) {
         redirect('/auth/sign-out')
       } else {
@@ -103,6 +102,13 @@ export async function api<T = unknown>(
       }
     }
 
-    return { response: undefined, error: e as ResponseErrorType }
+    return {
+      response: undefined,
+      error: {
+        message: error.message,
+        status: error.status,
+        errors: { ...(error.errors ?? {}) },
+      },
+    }
   }
 }
