@@ -11,13 +11,13 @@ use Symfony\Component\HttpFoundation\Response;
 class CategoriesController extends Controller
 {
     // Define a classe Categories
-    protected $categoriesClass;
+    protected $categories;
 
     // Inicializa a classe Categories
-    public function __construct(Categories $categoriesClass)
+    public function __construct(Categories $categories)
     {
         // Inicializa a classe Categories
-        $this->categoriesClass = $categoriesClass;
+        $this->categories = $categories;
     }
 
     /**
@@ -26,7 +26,7 @@ class CategoriesController extends Controller
     public function index(): JsonResponse
     {
         // Pega todos os registros da tabela categories
-        $categories = $this->categoriesClass->all();
+        $categories = $this->categories->all();
         // Retorna os registros em formato JSON
         return response()->json($categories, Response::HTTP_OK);
     }
@@ -39,7 +39,7 @@ class CategoriesController extends Controller
         // Passa pelo Request para validar os dados
         $data = $request->validated();
         // Cria o registro no banco de dados
-        $category = $this->categoriesClass->create($data);
+        $category = $this->categories->create($data);
         // Retorna o registro criado
         return response()->json($category, Response::HTTP_CREATED);
     }
@@ -47,10 +47,10 @@ class CategoriesController extends Controller
     /**
      * Retorna um registro específico da tabela categories
      */
-    public function show($id): JsonResponse
+    public function show(string $id): JsonResponse
     {
         // Pega o registro específico da tabela categories
-        $category = $this->categoriesClass->findOrFail($id);
+        $category = $this->categories->findOrFail($id);
         // Retorna o registro em formato JSON
         return response()->json($category, Response::HTTP_OK);
     }
@@ -58,10 +58,10 @@ class CategoriesController extends Controller
     /**
      * Atualiza um registro específico da tabela categories
      */
-    public function update(UpdateCategoriesRequest $request, $id): JsonResponse
+    public function update(UpdateCategoriesRequest $request, string $id): JsonResponse
     {
         // Pega o registro específico da tabela categories
-        $category = $this->categoriesClass->findOrFail($id);
+        $category = $this->categories->findOrFail($id);
         // Atualiza o registro
         $category->update($request->validated());
         // Retorna o registro atualizado
@@ -71,10 +71,10 @@ class CategoriesController extends Controller
     /**
      * Remove um registro específico da tabela categories
      */
-    public function destroy($id): JsonResponse
+    public function destroy(string $id): JsonResponse
     {
         // Pega o registro específico da tabela categories
-        $category = $this->categoriesClass->findOrFail($id);
+        $category = $this->categories->findOrFail($id);
         // Remove o registro
         $category->delete();
         // Retorna o registro removido

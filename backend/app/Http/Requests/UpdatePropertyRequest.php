@@ -11,7 +11,7 @@ class UpdatePropertyRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,15 @@ class UpdatePropertyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'image' => ['image', 'mimes:jpeg,png,jpg,webp'],
+            'title' => ['string', 'min:3', 'max:255'],
+            'description' => ['string', 'min:3', 'max:255'],
+            'price' => ['numeric', 'min:0'],
+            'features' => ['array'],
+            'features.*' => ['string', 'min:3', 'max:255'],
+            'address' => ['string', 'min:3', 'max:255'],
+            'category_id' => ['string', 'exists:categories,id'],
+            'acquired' => ['boolean'],
         ];
     }
 }

@@ -11,7 +11,7 @@ class StorePropertyRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,15 @@ class StorePropertyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'image' => ['nullable', 'string', 'max:255'],
+            'title' => ['required', 'string', 'min:3', 'max:255'],
+            'description' => ['nullable', 'string', 'min:3'],
+            'price' => ['required', 'numeric', 'min:0'],
+            'features' => ['required', 'array'],
+            'features.*' => ['string', 'min:3', 'max:255'],
+            'address' => ['required', 'string', 'min:3', 'max:255'],
+            'category_id' => ['required', 'string', 'exists:categories,id'],
+            'acquired' => ['nullable', 'boolean'],
         ];
     }
 }

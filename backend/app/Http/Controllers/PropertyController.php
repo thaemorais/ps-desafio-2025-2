@@ -10,21 +10,25 @@ use Symfony\Component\HttpFoundation\Response;
 
 class PropertyController extends Controller
 {
-    protected $propertyClass;
+    // Define a classe Property
+    protected $property;
 
-    public function __construct(Property $propertyClass)
+    // Inicializa a classe Property
+    public function __construct(Property $property)
     {
-        $this->propertyClass = $propertyClass;
+        // Inicializa a classe Property
+        $this->property = $property;
     }
-
     
 
     /**
-     * Display a listing of the resource.
+     * Retorna todos os registros da tabela properties
      */
     public function index(): JsonResponse
     {
-        $properties = $this->propertyClass->all();
+        // Pega todos os registros da tabela properties
+        $properties = $this->property->all();
+        // Retorna os registros em formato JSON
         return response()->json($properties, Response::HTTP_OK);
     }
 
@@ -33,38 +37,53 @@ class PropertyController extends Controller
      */
     public function store(StorePropertyRequest $request)
     {
-        
+        // Pega os dados do formulário
+        $data = $request->validated();
+
+        if($request->hasFile('image')) {
+            $path = $request->file('image')->store('image', 'public');
+            $data['image'] = url('storage/'.$path);
+        }
+        // Cria o registro no banco de dados
+        $property = $this->property->create($data);
+        // Retorna o registro criado em formato JSON
+        return response()->json($property, Response::HTTP_CREATED);
     }
 
     /**
-     * Display the specified resource.
+     * Retorna um registro específico da tabela properties
      */
-    public function show(Property $property)
+    public function show(string $id): JsonResponse
     {
-        //
+        // Pega o registro específico da tabela properties
+        $property = $this->property->findOrFail($id);
+        // Retorna o registro em formato JSON
+        return response()->json($property, Response::HTTP_OK);
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Atualiza um registro específico da tabela properties
      */
-    public function edit(Property $property)
+    public function update(UpdatePropertyRequest $request, string $id)
     {
-        //
+        // Pega o registro específico da tabela properties
+        $property = $this->property->findOrFail($id);
+        // Atualiza o registro
+        $property->update($request->validated());
+        // Retorna o registro atualizado em formato JSON
+        return response()->json($property, Response::HTTP_OK);
     }
 
     /**
-     * Update the specified resource in storage.
+     * Remove um registro específico da tabela properties
      */
-    public function update(UpdatePropertyRequest $request, Property $property)
+    public function destroy(string $id)
     {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Property $property)
-    {
-        //
+        // Pega o registro específico da tabela properties
+        $property = $this->property->findOrFail($id);
+        // Remove o registro
+        $property->delete();
+        // Retorna o registro removido em formato JSON
+        return response()->json(['message' => "Imóvel deletado com sucesso!"], Response::HTTP_OK);
     }
 }
