@@ -22,6 +22,18 @@ class Property extends Model
         'acquired',
     ];
 
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'features' => 'array',
+        ];
+    }
+
     public function category(): BelongsTo
     {
         return $this->belongsTo(Categories::class);
