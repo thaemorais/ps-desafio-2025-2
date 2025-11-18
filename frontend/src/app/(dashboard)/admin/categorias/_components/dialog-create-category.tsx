@@ -39,10 +39,13 @@ export function DialogCreateCategory({ children }: DialogCreateCategoryProps) {
       setError(error)
       toast({
         title: 'Não foi possível criar a categoria!',
+        description: error.message || 'Verifique os dados e tente novamente.',
+        variant: 'destructive',
       })
     } else {
       toast({
         title: 'Categoria criada com sucesso!',
+        description: 'A categoria foi adicionada ao sistema.',
       })
       setOpen(false)
     }
