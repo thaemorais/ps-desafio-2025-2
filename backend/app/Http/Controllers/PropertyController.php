@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Property;
 use App\Http\Requests\StorePropertyRequest;
 use App\Http\Requests\UpdatePropertyRequest;
+use App\Models\Categories;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -46,8 +47,13 @@ class PropertyController extends Controller
         }
         // Cria o registro no banco de dados
         $property = $this->property->create($data);
+
+        // validar se a categoria existe
+        $id = $property->id;
+        $category = $this->property->with('category')->findOrFail($id);
+        
         // Retorna o registro criado em formato JSON
-        return response()->json($property, Response::HTTP_CREATED);
+        return response()->json($category, Response::HTTP_CREATED);
     }
 
     /**

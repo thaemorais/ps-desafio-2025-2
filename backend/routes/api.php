@@ -31,6 +31,8 @@ Route::get('/categories', [CategoriesController::class, 'index']);
 Route::get('/categories/{id}', [CategoriesController::class, 'show']);
 // PUT - Atualiza um registro específico da tabela categories
 Route::put('/categories/{id}', [CategoriesController::class, 'update']);
+// POST - Atualiza um registro específico da tabela categories (method spoofing para FormData)
+Route::post('/categories/{id}', [CategoriesController::class, 'update']);
 // DELETE - Remove um registro específico da tabela categories
 Route::delete('/categories/{id}', [CategoriesController::class, 'destroy']);
 
