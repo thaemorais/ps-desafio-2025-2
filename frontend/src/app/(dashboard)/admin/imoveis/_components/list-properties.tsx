@@ -17,19 +17,25 @@ import { DialogUpdateProperty } from './dialog-update-property'
 import { DialogPropertyDelete } from './dialog-delete-property'
 import { DialogInformationProperty } from './dialog-information-property'
 import { DialogCreateProperty } from './dialog-create-property'
+import { listarImoveis } from '@/services/properties'
+import { listarCategorias } from '@/services/category'
 
 export default async function ListProperties() {
-  const { response } = null // requisicao para api
+  const properties = await listarImoveis();
+  const categories = await listarCategorias();
 
-  if (!response) {
+  // Criar um mapa de category_id -> category name para acesso rápido
+  const categoryMap = new Map(
+    categories.map((category) => [category.id, category.name])
+  );
+
+  if (!properties) {
     return (
       <DashboardContainer className="text-destructive">
         Não foi possível obter os imóveis.
       </DashboardContainer>
     )
   }
-
-  const properties: propertyType[] = response
 
   return (
     <>
@@ -46,9 +52,13 @@ export default async function ListProperties() {
           <TableHeader>
             <TableRow>
               <TableHead>Imagem</TableHead>
-              <TableHead>Titulo</TableHead>
+              <TableHead>Título</TableHead>
+              <TableHead>Descrição</TableHead>
+              <TableHead>Preço</TableHead>
               <TableHead>Categoria</TableHead>
-              <TableHead>Quantidade</TableHead>
+              <TableHead>Características</TableHead>
+              <TableHead>Endereço</TableHead>
+              <TableHead>Adquirido</TableHead>
               <TableHead className="text-right">Ações</TableHead>
             </TableRow>
           </TableHeader>
@@ -56,13 +66,21 @@ export default async function ListProperties() {
             {properties?.map((property: propertyType) => (
               <TableRow key={property.id}>
                 <TableCell>
-                  <TabbleCellImage src={property.image} />
+                  <TabbleCellImage src={property.image ?? ''} />
                 </TableCell>
                 
                 <TableCell>{property.title}</TableCell>
-                <TableCell>{property.amount}</TableCell>
-                <TableCell>{property.category.name}</TableCell>
-                {/* demais propriedades de propertyType */}
+                <TableCell>{property.description}</TableCell>
+                <TableCell>{property.price}</TableCell>
+                <TableCell>{categoryMap.get(property.category_id) ?? ''}</TableCell>
+                <TableCell>
+                  {Array.isArray(property.features) && property.features.length > 0
+                    ? property.features.join(', ')
+                    : ''}
+                </TableCell>
+                <TableCell>{property.address}</TableCell>
+                <TableCell>{property.acquired ? 'Sim' : 'Não'}</TableCell>
+
                 
                 <TableCell className="flex justify-end gap-2">
                   <DialogInformationProperty id={property.id}>

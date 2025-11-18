@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import styled from 'styled-components'
+import styled, { keyframes } from 'styled-components'
 
 import Footer from '../../app/(site)/components/Footer'
 import Navbar from '../../app/(site)/components/Navbar'
@@ -9,19 +9,22 @@ import CarrosselHero from './components/CarrosselHero'
 import CarrosselDestaques from './components/CarrosselDestaques'
 import CardImovel from './components/CardImovel'
 
-import { listarPropriedades } from '@/services/properties'
+import { listarImoveis } from '@/services/properties'
 import { propertyType } from '@/types/property'
 
 export default function Home() {
   const [properties, setProperties] = useState<propertyType[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     let isMounted = true
 
     async function loadProperties() {
-      const data = await listarPropriedades()
+      setIsLoading(true)
+      const data = await listarImoveis()
       if (isMounted) {
         setProperties(data)
+        setIsLoading(false)
       }
     }
 
@@ -40,11 +43,20 @@ export default function Home() {
 
         <Container>
           <CarrosselDestaques />
-          <GridCards>
-            {properties.map((property) => (
-              <CardImovel key={property.id} property={property} />
-            ))}
-          </GridCards>
+          {isLoading ? (
+            <LoadingContainer>
+              <LoadingContent>
+                <LoadingSpinner />
+                <LoadingText>Carregando imóveis...</LoadingText>
+              </LoadingContent>
+            </LoadingContainer>
+          ) : (
+            <GridCards>
+              {properties.map((property) => (
+                <CardImovel key={property.id} property={property} />
+              ))}
+            </GridCards>
+          )}
         </Container>
       </main>
       <Footer />
@@ -65,4 +77,42 @@ const Container = styled.div`
   max-width: 1280px;
   margin: 0 auto;
   padding: 0 15px;
+`
+
+const spin = keyframes`
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+`
+
+const LoadingContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  width: 100%;
+`
+
+const LoadingContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`
+
+const LoadingSpinner = styled.div`
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(11, 18, 44, 0.1);
+  border-top-color: #0b122c;
+  border-radius: 50%;
+  animation: ${spin} 0.8s linear infinite;
+`
+
+const LoadingText = styled.p`
+  margin-top: 16px;
+  color: #4a4a4a;
+  font-size: 0.95rem;
 `

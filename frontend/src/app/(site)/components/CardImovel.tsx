@@ -1,28 +1,47 @@
+'use client'
+
 import Link from 'next/link'
 import { BsChevronRight } from 'react-icons/bs'
-import styled from 'styled-components'
+import styled, { keyframes } from 'styled-components'
 
 import { propertyType } from '@/types/property'
+import { getCategory } from '@/services/category'
+import { Category } from '@/types/category'
+import { useEffect, useState } from 'react'
 
 type CardImovelProps = {
   property: propertyType
 }
 
 export default function CardImovel({ property }: CardImovelProps) {
-  const image = property.imagem ?? 'https://via.placeholder.com/600x800?text=Im%C3%B3vel'
+
+  const [category, setCategory] = useState<Category | null>(null)
+  const [isLoadingCategory, setIsLoadingCategory] = useState(true)
+
+  useEffect(() => {
+    const fetchCategory = async () => {
+      setIsLoadingCategory(true)
+      const { response } = await getCategory(property.category_id)
+      setCategory(response ?? null)
+      setIsLoadingCategory(false)
+    }
+    fetchCategory()
+  }, [property.category_id])
 
   return (
     <CardImovelContainer>
-      <CardImovelImage backgroundImage={image}>
+      <CardImovelImage $backgroundImage={property.image ?? ''}>
         <CardImovelContent>
           <FlexCenterBetween>
-              <h4>{property.categoria.nome}</h4>
-            <StatusBadge adquirido={property.adquirido}>
-              {property.adquirido ? 'Adquirido' : 'Disponível'}
+              <h4>
+                {isLoadingCategory ? <LoadingSpinnerSmall /> : category?.name}
+              </h4>
+            <StatusBadge $adquirido={property.acquired}>
+              {property.acquired ? 'Adquirido' : 'Disponível'}
             </StatusBadge>
           </FlexCenterBetween>
-          <h3>{property.titulo}</h3>
-            {property.descricao && <p>{property.descricao}</p>}
+          <h3>{property.title}</h3>
+            {property.description && <p>{property.description}</p>}
           <div>
             <Link href={`/${property.id}`}>
               Ver detalhes
@@ -52,8 +71,8 @@ const CardImovelContainer = styled.div`
     transition: scale 0.3s ease;
 `;
 
-const CardImovelImage = styled.div<{ backgroundImage: string }>`
-    background-image: ${({ backgroundImage }) => `url(${backgroundImage})`};
+const CardImovelImage = styled.div<{ $backgroundImage: string }>`
+    background-image: ${({ $backgroundImage }) => `url(${$backgroundImage})`};
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -100,6 +119,10 @@ const CardImovelContent = styled.div`
         gap: 8px;
         background-color: rgba(11, 18, 44, 0.45);
         transition: bottom 0.45s ease, background-color 0.3s ease;
+        
+        svg, div {
+          display: inline-block;
+        }
     }
     h3 {
         font-size: 1.5rem;
@@ -172,14 +195,33 @@ const CardImovelContent = styled.div`
     }
 `;
 
-const StatusBadge = styled.span<{ adquirido: boolean }>`
+const StatusBadge = styled.span<{ $adquirido: boolean }>`
     font-size: 0.875rem;
     font-weight: 600;
     width: fit-content;
     padding: 6px 16px;
     border-radius: 999px;
-    background-color: ${({ adquirido }) => (adquirido ? 'rgba(229, 57, 53, 0.7)' : 'rgba(76, 175, 80, 0.7)')};
+    background-color: ${({ $adquirido }) => ($adquirido ? 'rgba(229, 57, 53, 0.7)' : 'rgba(76, 175, 80, 0.7)')};
     color: #fff;
     margin-bottom: auto;
     align-self: flex-end;
+`;
+
+const spin = keyframes`
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+`
+
+const LoadingSpinnerSmall = styled.div`
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: ${spin} 0.8s linear infinite;
+  display: inline-block;
 `;

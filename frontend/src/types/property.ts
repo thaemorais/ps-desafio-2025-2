@@ -2,13 +2,12 @@ import { categoryType } from './category'
 
 export type propertyType = {
   id: string
-  imagem: string | null
-  titulo: string
-  descricao: string | null
-  preco: number
-  caracteristicas: string[]
-  endereco: string
-  categoriaId: string
-  categoria: categoryType
-  adquirido: boolean
+  image: string | null
+  title: string
+  description: string | null
+  price: number
+  features: string[]
+  address: string
+  category_id: string
+  acquired: boolean
 }

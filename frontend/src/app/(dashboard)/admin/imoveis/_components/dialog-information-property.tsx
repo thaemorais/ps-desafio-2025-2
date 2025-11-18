@@ -10,9 +10,9 @@ import {
 } from '@/components/dialog'
 import FormFieldsProperty from './form-fields-property'
 import { propertyType } from '@/types/property'
-import { api } from '@/services/api'
 import { useEffect, useState } from 'react'
 import { useToast } from '@/components/use-toast'
+import { buscarImovelPorId } from '@/services/properties'
 
 interface DialogInformationPropertyProps {
   id: string
@@ -30,14 +30,14 @@ export function DialogInformationProperty({
 
   useEffect(() => {
     const requestData = async () => {
-      const { response } = null
+      const property = await buscarImovelPorId(id);
 
-      if (response) {
-        setProperty(response)
+      if (property) {
+        setProperty(property)
       } else {
         setProperty(null)
         toast({
-          title: 'Veículo não encontrado!',
+          title: 'Imóvel não encontrado!',
         })
         setOpen(false)
       }
@@ -58,7 +58,13 @@ export function DialogInformationProperty({
             Visualize as informações detalhadas do imóvel abaixo.
           </DialogDescription>
         </DialogHeader>
-        <FormFieldsProperty property={property} readOnly />
+        {property ? (
+          <FormFieldsProperty property={property} readOnly />
+        ) : (
+          <div className="flex justify-center items-center h-full">
+            <p className="text-sm text-gray-500">Carregando...</p>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   )

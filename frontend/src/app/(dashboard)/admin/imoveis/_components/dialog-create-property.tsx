@@ -33,7 +33,7 @@ export function DialogCreateProperty({ children }: DialogCreatePropertyProps) {
   const submit = async (form: FormData) => {
     const newForm = await filterFormData(form)
 
-    const { error } = await JSON.parse(await createProperty(newForm))
+    const { error } = await createProperty(newForm)
 
     if (error) {
       setError(error)

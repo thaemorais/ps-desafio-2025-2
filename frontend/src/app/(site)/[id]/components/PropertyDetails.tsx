@@ -1,13 +1,16 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
-import styled from 'styled-components'
+import { useEffect, useState } from 'react'
+import styled, { keyframes } from 'styled-components'
 
-import { Property } from '@/types/property'
+import { propertyType } from '@/types/property'
+import { getCategory } from '@/services/category'
+import { Category } from '@/types/category'
+import { updateProperty } from '@/actions/property'
 
 type PropertyDetailsProps = {
-  property: Property
+  property: propertyType
   formatadorDePreco?: Intl.NumberFormat
 }
 
@@ -21,29 +24,47 @@ export default function PropertyDetails({
   formatadorDePreco = formatadorDePrecoPadrao,
 }: PropertyDetailsProps) {
   const [propertyAtual, setPropertyAtual] = useState(property)
+  const [isUpdating, setIsUpdating] = useState(false)
 
-  const imagemDestaque =
-    propertyAtual.imagem ?? 'https://via.placeholder.com/1600x900?text=Im%C3%B3vel+sem+imagem'
-
-  const handleAdquirirImovel = () => {
+  const handleAdquirirImovel = async () => {
+    setIsUpdating(true)
     setPropertyAtual((prev) => ({
       ...prev,
       adquirido: true,
     }))
+    const formData = new FormData()
+    formData.append('acquired', 'true')
+    await updateProperty(property.id, formData)
+    setIsUpdating(false)
   }
+
+  const [category, setCategory] = useState<Category | null>(null)
+  const [isLoadingCategory, setIsLoadingCategory] = useState(true)
+
+  useEffect(() => {
+    const fetchCategory = async () => {
+      setIsLoadingCategory(true)
+      const { response } = await getCategory(property.category_id)
+      setCategory(response ?? null)
+      setIsLoadingCategory(false)
+    }
+    fetchCategory()
+  }, [property.category_id])
 
   return (
     <Main>
-      <Hero backgroundImage={imagemDestaque}>
+      <Hero $backgroundImage={propertyAtual.image ?? ''}>
         <HeroOverlay>
           <HeroContent>
-            <CategoryBadge>{propertyAtual.categoria.nome}</CategoryBadge>
-            <HeroTitle>{propertyAtual.titulo}</HeroTitle>
+            <CategoryBadge>
+              {isLoadingCategory ? <LoadingSpinnerSmall /> : category?.name}
+            </CategoryBadge>
+            <HeroTitle>{propertyAtual.title}</HeroTitle>
             <HeroMeta>
-              <StatusBadge adquirido={propertyAtual.adquirido}>
-                {propertyAtual.adquirido ? 'Adquirido' : 'Disponível'}
+              <StatusBadge $adquirido={propertyAtual.acquired}>
+                {propertyAtual.acquired ? 'Adquirido' : 'Disponível'}
               </StatusBadge>
-              <PriceTag>{formatadorDePreco.format(propertyAtual.preco)}</PriceTag>
+              <PriceTag>{formatadorDePreco.format(propertyAtual.price ?? 0)}</PriceTag>
             </HeroMeta>
           </HeroContent>
         </HeroOverlay>
@@ -53,31 +74,31 @@ export default function PropertyDetails({
         <Breadcrumb>
           <Link href="/">Início</Link>
           <span>/</span>
-          <span>{propertyAtual.titulo}</span>
+          <span>{propertyAtual.title}</span>
         </Breadcrumb>
 
         <Section>
           <SectionTitle>Descrição</SectionTitle>
-          <SectionText>{propertyAtual.descricao ?? 'Descrição não informada.'}</SectionText>
+          <SectionText>{propertyAtual.description ?? 'Descrição não informada.'}</SectionText>
         </Section>
 
         <InfoGrid>
           <Section>
             <SectionTitle>Destaques</SectionTitle>
             <FeaturesList>
-              {propertyAtual.caracteristicas.map((caracteristica) => (
-                <li key={caracteristica}>{caracteristica}</li>
+              {propertyAtual.features?.map((feature) => (
+                <li key={feature}>{feature}</li>
               ))}
             </FeaturesList>
           </Section>
 
           <Section>
             <SectionTitle>Localização</SectionTitle>
-            <SectionText>{propertyAtual.endereco}</SectionText>
+            <SectionText>{propertyAtual.address}</SectionText>
             <MapContainer>
               <MapFrame
-                title={`Mapa de ${propertyAtual.titulo}`}
-                src={`https://www.google.com/maps?q=${encodeURIComponent(propertyAtual.endereco)}&output=embed`}
+                title={`Mapa de ${propertyAtual.title}`}
+                src={`https://www.google.com/maps?q=${encodeURIComponent(propertyAtual.address)}&output=embed`}
                 allowFullScreen
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
@@ -88,9 +109,16 @@ export default function PropertyDetails({
 
         <Actions>
           <PrimaryLink href="/">Voltar para a lista</PrimaryLink>
-          {!propertyAtual.adquirido && (
-            <SecondaryButton type="button" onClick={handleAdquirirImovel}>
-              Adquirir imóvel
+          {!propertyAtual.acquired && (
+            <SecondaryButton type="button" onClick={handleAdquirirImovel} disabled={isUpdating}>
+              {isUpdating ? (
+                <>
+                  <LoadingSpinnerButton />
+                  Processando...
+                </>
+              ) : (
+                'Adquirir imóvel'
+              )}
             </SecondaryButton>
           )}
         </Actions>
@@ -105,10 +133,10 @@ const Main = styled.main`
   min-height: calc(100vh - 160px);
 `
 
-const Hero = styled.section<{ backgroundImage: string }>`
+const Hero = styled.section<{ $backgroundImage: string }>`
   width: 100%;
   min-height: 420px;
-  background-image: ${({ backgroundImage }) => `linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.5)), url(${backgroundImage})`};
+  background-image: ${({ $backgroundImage }) => `linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.5)), url(${$backgroundImage})`};
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -155,12 +183,12 @@ const HeroMeta = styled.div`
   gap: 16px;
 `
 
-const StatusBadge = styled.span<{ adquirido: boolean }>`
+const StatusBadge = styled.span<{ $adquirido: boolean }>`
   padding: 8px 18px;
   border-radius: 999px;
   font-weight: 600;
   font-size: 0.95rem;
-  background-color: ${({ adquirido }) => (adquirido ? 'rgba(229, 57, 53, 0.8)' : 'rgba(76, 175, 80, 0.8)')};
+  background-color: ${({ $adquirido }) => ($adquirido ? 'rgba(229, 57, 53, 0.8)' : 'rgba(76, 175, 80, 0.8)')};
   color: #fff;
 `
 
@@ -278,10 +306,19 @@ const SecondaryButton = styled.button`
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
 
-  &:hover {
+  &:hover:not(:disabled) {
     background-color: #0b122c;
     color: #fff;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 `
 
@@ -299,5 +336,34 @@ const MapFrame = styled.iframe`
   height: 100%;
   min-height: 320px;
   border: 0;
+`
+
+const spin = keyframes`
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+`
+
+const LoadingSpinnerSmall = styled.div`
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: ${spin} 0.8s linear infinite;
+  display: inline-block;
+`
+
+const LoadingSpinnerButton = styled.div`
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(11, 18, 44, 0.3);
+  border-top-color: #0b122c;
+  border-radius: 50%;
+  animation: ${spin} 0.8s linear infinite;
+  display: inline-block;
 `
 

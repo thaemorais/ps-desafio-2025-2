@@ -4,6 +4,7 @@ import '@/app/globals.css'
 import { Providers } from '@/providers/providers'
 import { Toaster as SonnerToaster } from '@/components/sonner'
 import { Toaster } from '@/components/toaster'
+import StyledComponentsRegistry from '@/lib/styled-components-registry'
 
 const roboto = Roboto({
   subsets: ['latin'],
@@ -21,13 +22,15 @@ export default async function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="pt-BR">
-      <body className={roboto.className}>
-        <Providers>
-          {children}
-          <SonnerToaster />
-          <Toaster />
-        </Providers>
+    <html lang="pt-BR" suppressHydrationWarning>
+      <body className={roboto.className} suppressHydrationWarning>
+        <StyledComponentsRegistry>
+          <Providers>
+            {children}
+            <SonnerToaster />
+            <Toaster />
+          </Providers>
+        </StyledComponentsRegistry>
       </body>
     </html>
   )
