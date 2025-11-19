@@ -6,11 +6,11 @@ import styled, { keyframes } from 'styled-components'
 import Footer from '../../app/(site)/components/Footer'
 import Navbar from '../../app/(site)/components/Navbar'
 import CarrosselHero from './components/CarrosselHero'
-import CarrosselDestaques from './components/CarrosselDestaques'
 import CardImovel from './components/CardImovel'
 
 import { listarImoveis } from '@/services/properties'
 import { propertyType } from '@/types/property'
+import BannerMiddle from './components/BannerMiddle'
 
 export default function Home() {
   const [properties, setProperties] = useState<propertyType[]>([])
@@ -40,9 +40,8 @@ export default function Home() {
       <Navbar />
       <main>
         <CarrosselHero />
-
+        <BannerMiddle />
         <Container>
-          <CarrosselDestaques />
           {isLoading ? (
             <LoadingContainer>
               <LoadingContent>
