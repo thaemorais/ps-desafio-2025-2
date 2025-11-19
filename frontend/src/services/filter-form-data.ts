@@ -45,6 +45,22 @@ export async function filterFormData(form: FormData) {
           originalSize: value.size,
           compressedSize: compressed.size,
         })
+      } else if (key === 'features' && typeof value === 'string') {
+        // Converte features de string separada por vírgula para array
+        const featuresArray = value
+          .split(',')
+          .map((f) => f.trim())
+          .filter((f) => f.length > 0)
+        
+        console.log(`🟢 [FILTER FORM DATA] Convertendo features de string para array:`, {
+          original: value,
+          converted: featuresArray,
+        })
+        
+        // Adiciona cada feature como um item do array no FormData
+        featuresArray.forEach((feature) => {
+          newFormData.append(`${key}[]`, feature)
+        })
       } else {
         console.log(`🟢 [FILTER FORM DATA] Adicionando "${key}" = "${value}"`)
         newFormData.append(key, value)

@@ -1,9 +1,9 @@
 import { notFound } from 'next/navigation'
 
-import Footer from '@/app/(site)/components/Footer'
-import Navbar from '@/app/(site)/components/Navbar'
+import Footer from '@/app/(site)/_components/Footer'
+import Navbar from '@/app/(site)/_components/Navbar'
 import { buscarImovelPorId } from '@/services/properties'
-import PropertyDetails from './components/PropertyDetails'
+import PropertyDetails from './_components/PropertyDetails'
 
 type PaginaImovelProps = {
   params: Promise<{

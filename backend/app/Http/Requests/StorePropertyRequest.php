@@ -22,7 +22,7 @@ class StorePropertyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'image' => ['nullable', 'string', 'max:255'],
+            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
             'title' => ['required', 'string', 'min:3', 'max:255'],
             'description' => ['nullable', 'string', 'min:3'],
             'price' => ['required', 'numeric', 'min:0'],

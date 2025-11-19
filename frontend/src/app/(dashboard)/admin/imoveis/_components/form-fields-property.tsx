@@ -21,6 +21,7 @@ import { Switch } from '@/components/switch'
 import { cn } from '@/lib/utils'
 import { ResponseErrorType } from '@/services/api'
 import { getCategories } from '@/services/category'
+import { buscarCep, formatarEndereco, extrairDadosEndereco, type CepResponse } from '@/services/cep'
 import { categoryType } from '@/types/category'
 import { propertyType } from '@/types/property'
 import { useEffect, useState } from 'react'
@@ -44,6 +45,14 @@ export default function FormFieldsProperty({
     property?.category_id ?? '',
   )
   const [acquired, setAcquired] = useState<boolean>(property?.acquired ?? false)
+  
+  // Estados para endereço
+  const [cep, setCep] = useState<string>('')
+  const [numero, setNumero] = useState<string>('')
+  const [complemento, setComplemento] = useState<string>('')
+  const [cepData, setCepData] = useState<CepResponse | null>(null)
+  const [buscandoCep, setBuscandoCep] = useState(false)
+  const [enderecoCompleto, setEnderecoCompleto] = useState<string>('')
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -67,10 +76,101 @@ export default function FormFieldsProperty({
     }
   }, [property?.acquired])
 
+  // Extrai CEP, número e complemento do endereço existente ao editar
+  useEffect(() => {
+    if (property?.address && !cep && !numero && !cepData) {
+      const dados = extrairDadosEndereco(property.address)
+      if (dados.cep) {
+        setCep(dados.cep)
+        // Busca os dados do CEP automaticamente
+        buscarCep(dados.cep)
+          .then((data) => {
+            if (data) {
+              setCepData(data)
+            }
+          })
+          .catch(() => {
+            // Ignora erros
+          })
+      }
+      if (dados.numero) {
+        setNumero(dados.numero)
+      }
+      if (dados.complemento) {
+        setComplemento(dados.complemento)
+      }
+    }
+  }, [property?.address])
+
+  // Busca CEP automaticamente quando o campo é preenchido
+  useEffect(() => {
+    const cepLimpo = cep.replace(/\D/g, '')
+    
+    if (cepLimpo.length === 8) {
+      // Evita buscar novamente se já temos os dados para este CEP
+      const cepDataLimpo = cepData?.cep?.replace(/-/g, '')
+      if (cepDataLimpo === cepLimpo) {
+        return
+      }
+      
+      setBuscandoCep(true)
+      buscarCep(cepLimpo)
+        .then((data) => {
+          if (data) {
+            setCepData(data)
+          } else {
+            setCepData(null)
+          }
+        })
+        .catch(() => {
+          setCepData(null)
+        })
+        .finally(() => {
+          setBuscandoCep(false)
+        })
+    } else if (cepLimpo.length === 0) {
+      // Limpa os dados quando o CEP é removido
+      setCepData(null)
+      setEnderecoCompleto('')
+    } else {
+      setCepData(null)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cep])
+
+  // Monta o endereço completo quando CEP, número ou complemento mudam
+  useEffect(() => {
+    if (cepData) {
+      const endereco = formatarEndereco(cepData, numero, complemento)
+      setEnderecoCompleto(endereco)
+    } else {
+      setEnderecoCompleto('')
+    }
+  }, [cepData, numero, complemento])
+
   return (
     <>
       <FormFieldsGroup>
         {property && <Input defaultValue={property.id} type="text" name="id" hidden />}
+        <FormField>
+          <Label htmlFor="image" hidden={readOnly && !property?.image}>
+            Imagem
+          </Label>
+          <Input
+            name="image"
+            id="image"
+            type="file"
+            accept="image/*"
+            disabled={pending}
+            hidden={readOnly}
+            onChange={(e) => handleImageChange(e, setUpdateImage)}
+            error={error?.errors?.image}
+          />
+          <ImageForm
+            className="aspect-video w-full max-w-md"
+            src={updateImage || property?.image || undefined}
+          />
+        </FormField>
         <FormField>
           <Label htmlFor="title" required={!property}>
             Título
@@ -83,6 +183,7 @@ export default function FormFieldsProperty({
             disabled={pending}
             readOnly={readOnly}
             error={error?.errors?.title}
+            placeholder="Insira o título do imóvel"
           />
         </FormField>
         <FormField>
@@ -92,6 +193,7 @@ export default function FormFieldsProperty({
           <Input
             id="description"
             name="description"
+            placeholder="Insira a descrição do imóvel"
             type="text"
             defaultValue={property?.description ?? undefined}
             disabled={pending}
@@ -101,11 +203,12 @@ export default function FormFieldsProperty({
         </FormField>
         <FormField>
           <Label htmlFor="price" required={!property}>
-            Preço
+            Preço (apenas números)
           </Label>
           <Input
             id="price"
             name="price"
+            placeholder="Insira o preço do imóvel"
             type="number"
             defaultValue={property?.price}
             disabled={pending}
@@ -157,22 +260,85 @@ export default function FormFieldsProperty({
             disabled={pending}
             readOnly={readOnly}
             error={error?.errors?.features}
+            placeholder="Insira as características do imóvel"
           />
         </FormField>
         <FormField>
-          <Label htmlFor="address" required={!property}>
-            Endereço
+          <Label htmlFor="cep" required={!property}>
+            CEP
           </Label>
           <Input
-            id="address"
-            name="address"
+            id="cep"
             type="text"
-            defaultValue={property?.address}
-            disabled={pending}
-            readOnly={readOnly}
+            value={cep}
+            onChange={(e) => {
+              const valor = e.target.value.replace(/\D/g, '')
+              if (valor.length <= 8) {
+                setCep(valor)
+              }
+            }}
+            placeholder="00000000"
+            disabled={pending || readOnly}
+            error={error?.errors?.address}
+            maxLength={8}
+          />
+          {buscandoCep && (
+            <p className="text-muted-foreground text-xs mt-1 col-start-2 col-end-5">
+              Buscando endereço...
+            </p>
+          )}
+          {cepData && !buscandoCep && (
+            <p className="text-green-600 text-xs mt-1 col-start-2 col-end-5">
+              {cepData.logradouro}, {cepData.bairro}, {cepData.localidade} - {cepData.uf}
+            </p>
+          )}
+          {cep.replace(/\D/g, '').length === 8 && !cepData && !buscandoCep && (
+            <p className="text-destructive text-xs mt-1 col-start-2 col-end-5">
+              CEP não encontrado
+            </p>
+          )}
+        </FormField>
+        <FormField>
+          <Label htmlFor="numero" required={!property}>
+            Número
+          </Label>
+          <Input
+            id="numero"
+            type="text"
+            value={numero}
+            onChange={(e) => setNumero(e.target.value)}
+            placeholder="123"
+            disabled={pending || readOnly}
             error={error?.errors?.address}
           />
         </FormField>
+        <FormField>
+          <Label htmlFor="complemento">
+            Complemento
+          </Label>
+          <Input
+            id="complemento"
+            type="text"
+            value={complemento}
+            onChange={(e) => setComplemento(e.target.value)}
+            placeholder="Apto 101, Bloco A, etc."
+            disabled={pending || readOnly}
+            error={error?.errors?.address}
+          />
+        </FormField>
+        {/* Campo hidden com o endereço completo formatado */}
+        <Input
+          id="address"
+          name="address"
+          type="hidden"
+          value={enderecoCompleto || property?.address || ''}
+        />
+        {!property && cep.replace(/\D/g, '').length === 8 && !enderecoCompleto && (
+          <p className="text-destructive text-xs mt-1 col-start-2 col-end-5">
+            Preencha o número do endereço
+          </p>
+        )}
+        
         <FormField>
           <Label htmlFor="acquired">
             Adquirido

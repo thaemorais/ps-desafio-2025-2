@@ -22,15 +22,15 @@ class UpdatePropertyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'image' => ['image', 'mimes:jpeg,png,jpg,webp'],
-            'title' => ['string', 'min:3', 'max:255'],
-            'description' => ['string', 'min:3', 'max:255'],
-            'price' => ['numeric', 'min:0'],
-            'features' => ['array'],
+            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+            'title' => ['nullable', 'string', 'min:3', 'max:255'],
+            'description' => ['nullable', 'string', 'min:3', 'max:255'],
+            'price' => ['nullable', 'numeric', 'min:0'],
+            'features' => ['nullable', 'array'],
             'features.*' => ['string', 'min:3', 'max:255'],
-            'address' => ['string', 'min:3', 'max:255'],
-            'category_id' => ['string', 'exists:categories,id'],
-            'acquired' => ['boolean'],
+            'address' => ['nullable', 'string', 'min:3', 'max:255'],
+            'category_id' => ['nullable', 'string', 'exists:categories,id'],
+            'acquired' => ['nullable', 'boolean'],
         ];
     }
 }

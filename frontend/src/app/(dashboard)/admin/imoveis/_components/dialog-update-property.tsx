@@ -53,7 +53,7 @@ export function DialogUpdateProperty({ id, children }: DialogUpdatePropertyProps
   const submit = async (form: FormData) => {
     const newForm = await filterFormData(form)
 
-    const { error } = null 
+    const { error } = await updateProperty(id, newForm)
 
     if (error) {
       setError(error)

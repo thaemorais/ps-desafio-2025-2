@@ -4,7 +4,8 @@ const nextConfig = {
     styledComponents: true,
   },
   images: {
-    domains: [process.env.NEXT_PUBLIC_API_DOMAIN, 'via.placeholder.com', 'picsum.photos', 'images.unsplash.com'],
+    // Desabilita otimização de imagens - permite qualquer URL
+    unoptimized: true,
   },
 }
 

@@ -6,8 +6,10 @@ use App\Models\Property;
 use App\Http\Requests\StorePropertyRequest;
 use App\Http\Requests\UpdatePropertyRequest;
 use App\Models\Categories;
+use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Throwable;
 
 class PropertyController extends Controller
 {
@@ -74,8 +76,30 @@ class PropertyController extends Controller
     {
         // Pega o registro específico da tabela properties
         $property = $this->property->findOrFail($id);
+        // Pega os dados validados
+        $data = $request->validated();
+
+        // Processa upload de imagem se houver
+        if ($request->hasFile('image')) {
+            try {
+                // Remove a imagem antiga se existir
+                if ($property->image) {
+                    $image_name = explode('image/', $property->image);
+                    if (isset($image_name[1])) {
+                        Storage::disk('public')->delete('image/'.$image_name[1]);
+                    }
+                }
+            } catch (Throwable) {
+                // Ignora erros ao deletar imagem antiga
+            } finally {
+                // Armazena a nova imagem
+                $path = $request->file('image')->store('image', 'public');
+                $data['image'] = url('storage/'.$path);
+            }
+        }
+
         // Atualiza o registro
-        $property->update($request->validated());
+        $property->update($data);
         // Retorna o registro atualizado em formato JSON
         return response()->json($property, Response::HTTP_OK);
     }
