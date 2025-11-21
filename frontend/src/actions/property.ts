@@ -22,27 +22,30 @@ export async function createProperty(form: FormData) {
 /**
  * Atualiza uma propriedade existente
  * @param id - ID da propriedade
- * @param form - FormData com os dados atualizados
+ * @param data - FormData ou objeto com os dados atualizados
  * @returns Promise com response e error
  */
-export async function updateProperty(id: string, form: FormData) {  
-  // Log do FormData recebido
-  const formEntries: Record<string, string> = {}
-  for (const [key, value] of form.entries()) {
-    formEntries[key] = value instanceof File 
-      ? `[File: ${value.name}, ${value.size} bytes]`
-      : String(value)
+export async function updateProperty(id: string, data: FormData | Record<string, unknown>) {  
+  // Se for FormData, verifica method spoofing
+  let method: 'POST' | 'PUT' = 'PUT'
+  
+  if (data instanceof FormData) {
+    const hasMethodSpoofing = data.has('_method')
+    method = hasMethodSpoofing ? 'POST' : 'PUT'
   }
   
-  // Verifica se tem _method no FormData (method spoofing)
-  const hasMethodSpoofing = form.has('_method')
-  const method = hasMethodSpoofing ? 'POST' : 'PUT'
-  
-  const { response, error } = await api<propertyType>(method, `/properties/${id}`, { data: form })
-  
+  // Axios detecta automaticamente se é FormData ou JSON e define o Content-Type apropriado
+  const { response, error } = await api<propertyType>(method, `/properties/${id}`, { 
+    data
+  })
   
   if (!error) {
+    // Revalida a página de administração de imóveis
     revalidatePath('/admin/imoveis')
+    // Revalida a página do imóvel específico
+    revalidatePath(`/${id}`)
+    // Revalida a página inicial que lista os imóveis
+    revalidatePath('/')
   }
   
   return { response, error }

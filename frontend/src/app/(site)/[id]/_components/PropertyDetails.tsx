@@ -2,11 +2,13 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 import { propertyType } from '@/types/property'
 import { getCategory } from '@/services/category'
 import { Category } from '@/types/category'
 import { updateProperty } from '@/actions/property'
+import { useToast } from '@/components/use-toast'
 import styles from './PropertyDetails.module.css'
 
 type PropertyDetailsProps = {
@@ -25,17 +27,51 @@ export default function PropertyDetails({
 }: PropertyDetailsProps) {
   const [propertyAtual, setPropertyAtual] = useState(property)
   const [isUpdating, setIsUpdating] = useState(false)
+  const { toast } = useToast()
+  const router = useRouter()
 
   const handleAdquirirImovel = async () => {
     setIsUpdating(true)
-    setPropertyAtual((prev) => ({
-      ...prev,
-      adquirido: true,
-    }))
-    const formData = new FormData()
-    formData.append('acquired', 'true')
-    await updateProperty(property.id, formData)
-    setIsUpdating(false)
+    
+    try {
+      // Envia como JSON em vez de FormData, já que não há upload de arquivo
+      const { response, error } = await updateProperty(property.id, { acquired: 1 })
+      
+      if (error) {
+        toast({
+          title: 'Erro ao adquirir imóvel',
+          description: error.message || 'Não foi possível adquirir o imóvel. Tente novamente.',
+          variant: 'destructive',
+        })
+        setIsUpdating(false)
+        return
+      }
+
+      // Atualiza o estado local apenas após sucesso da API
+      if (response) {
+        setPropertyAtual((prev) => ({
+          ...prev,
+          acquired: true,
+        }))
+        
+        toast({
+          title: 'Imóvel adquirido com sucesso!',
+          description: 'O imóvel foi marcado como adquirido.',
+        })
+        
+        // Revalida a página atual para garantir sincronização
+        router.refresh()
+      }
+    } catch (error) {
+      console.error('Erro ao adquirir imóvel:', error)
+      toast({
+        title: 'Erro inesperado',
+        description: 'Ocorreu um erro ao processar a solicitação. Tente novamente.',
+        variant: 'destructive',
+      })
+    } finally {
+      setIsUpdating(false)
+    }
   }
 
   const [category, setCategory] = useState<Category | null>(null)

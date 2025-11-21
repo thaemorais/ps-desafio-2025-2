@@ -43,6 +43,11 @@ class PropertyController extends Controller
         // Pega os dados do formulário
         $data = $request->validated();
 
+        // Converte '1' ou '0' para boolean se o campo acquired estiver presente
+        if (isset($data['acquired'])) {
+            $data['acquired'] = $data['acquired'] === '1' || $data['acquired'] === 1 || $data['acquired'] === true;
+        }
+
         if($request->hasFile('image')) {
             $path = $request->file('image')->store('image', 'public');
             $data['image'] = url('storage/'.$path);
@@ -79,6 +84,11 @@ class PropertyController extends Controller
         // Pega os dados validados
         $data = $request->validated();
 
+        // Converte '1' ou '0' para boolean se o campo acquired estiver presente
+        if (isset($data['acquired'])) {
+            $data['acquired'] = $data['acquired'] === '1' || $data['acquired'] === 1 || $data['acquired'] === true;
+        }
+
         // Processa upload de imagem se houver
         if ($request->hasFile('image')) {
             try {
@@ -100,6 +110,7 @@ class PropertyController extends Controller
 
         // Atualiza o registro
         $property->update($data);
+        
         // Retorna o registro atualizado em formato JSON
         return response()->json($property, Response::HTTP_OK);
     }

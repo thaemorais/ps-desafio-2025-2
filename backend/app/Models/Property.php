@@ -49,6 +49,7 @@ class Property extends Model
     {
         return [
             'features' => 'array',
+            'acquired' => 'boolean',
         ];
     }
 
