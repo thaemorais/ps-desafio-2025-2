@@ -9,7 +9,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/dashboard/table'
-import { api } from '@/services/api'
 import { propertyType } from '@/types/property'
 import { Button } from '@/components/button'
 import { LuInfo, LuPen, LuPlusCircle, LuTrash } from 'react-icons/lu'

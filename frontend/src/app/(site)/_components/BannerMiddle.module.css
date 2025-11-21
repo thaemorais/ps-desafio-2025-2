@@ -1,0 +1,13 @@
+.bannerMiddleContainer {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 1080 / 377;
+  margin: 30px 0;
+}
+
+.bannerMiddleContainer img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+

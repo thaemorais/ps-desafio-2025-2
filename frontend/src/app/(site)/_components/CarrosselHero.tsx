@@ -4,12 +4,12 @@ import { listarImoveis } from "@/services/properties";
 import { propertyType } from "@/types/property";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import styled from "styled-components";
 import type { Swiper as SwiperType } from "swiper";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
+import styles from "./CarrosselHero.module.css";
 
 export default function CarrosselHero() {
   const swiperInstanceRef = useRef<SwiperType | null>(null);
@@ -84,14 +84,14 @@ export default function CarrosselHero() {
   }, [properties]);
 
   return (
-    <SliderContainer>
-      <StyledSwiper ref={swiperContainerRef} className="swiper">
+    <section className={styles.sliderContainer}>
+      <div ref={swiperContainerRef} className={`${styles.styledSwiper} swiper`}>
         <div className="swiper-wrapper">
           {properties
             .filter((property) => property.image) // Filtra apenas propriedades com imagem
             .map((property) => (
               <div key={property.id} className="swiper-slide">
-                <SlideImageContainer>
+                <div className={styles.slideImageContainer}>
                   <Image
                     src={property.image!}
                     alt={property.title}
@@ -99,10 +99,10 @@ export default function CarrosselHero() {
                     style={{ objectFit: "cover" }}
                     priority
                   />
-                  <SlideTitleOverlay>
-                    <SlideTitle>{property.title}</SlideTitle>
-                  </SlideTitleOverlay>
-                </SlideImageContainer>
+                  <div className={styles.slideTitleOverlay}>
+                    <h2 className={styles.slideTitle}>{property.title}</h2>
+                  </div>
+                </div>
               </div>
             ))}
         </div>
@@ -110,83 +110,7 @@ export default function CarrosselHero() {
 
         <div className="swiper-button-prev"></div>
         <div className="swiper-button-next"></div>
-      </StyledSwiper>
-    </SliderContainer>
+      </div>
+    </section>
   );
 }
-
-const SliderContainer = styled.section`
-  width: 100%;
-  height: 100%;
-  background-color: #f0f0f0;
-`;
-
-const StyledSwiper = styled.div`
-  .swiper-button-prev,
-  .swiper-button-next {
-    background-color: #fff !important;
-    border-radius: 50% !important;
-    width: 40px !important;
-    height: 40px !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-  }
-
-  .swiper-button-prev::after,
-  .swiper-button-next::after {
-    font-size: 24px !important;
-    color: #000 !important;
-  }
-
-  .swiper-pagination-bullet {
-    background-color: #fff !important;
-    opacity: 0.5 !important;
-    width: 10px !important;
-    height: 10px !important;
-    border-radius: 50% !important;
-  }
-  .swiper-pagination-bullet-active {
-    opacity: 1 !important;
-  }
-
-
-  .swiper-slide {
-    position: relative;
-    width: 100%;
-    height: 100%;
-  }
-`;
-
-const SlideImageContainer = styled.div`
-  position: relative;
-  width: 100%;
-  height: 100%;
-  min-height: 500px;
-  margin: 0 auto;
-`;
-
-const SlideTitleOverlay = styled.div`
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
-  padding: 2rem;
-  display: flex;
-  align-items: flex-end;
-`;
-
-const SlideTitle = styled.h2`
-  color: #fff;
-  font-size: 2rem;
-  font-weight: bold;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-  margin: 0;
-  width: 100%;
-  text-align: center;
-  
-  @media (max-width: 768px) {
-    font-size: 1.5rem;
-  }
-`;
