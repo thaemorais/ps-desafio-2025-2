@@ -1,3 +1,7 @@
+.main {
+  margin-top: 120px;
+}
+
 .gridCards {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -51,3 +55,11 @@
   font-size: 0.95rem;
 }
 
+@media only screen and (max-width: 768px) {
+  .gridCards {
+    grid-template-columns: repeat( 1, 1fr);
+  }
+  .main {
+    margin-top: 100px;
+  }
+}

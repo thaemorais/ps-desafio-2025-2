@@ -19,42 +19,27 @@ export default function CarrosselHero() {
   useEffect(() => {
     let isMounted = true;
 
-    async function loadProperties() {
+    async function initSwiper() {
+      // Carregar propriedades
       const data = await listarImoveis();
-      if (isMounted) {
-        setProperties(data);
-      }
-    }
-
-    loadProperties();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    async function mountSwiper() {
-      if (typeof window === "undefined" || !isMounted || properties.length === 0 || !swiperContainerRef.current) {
-        return;
-      }
-
-      // Aguardar o próximo frame para garantir que o DOM está renderizado
+      if (!isMounted) return;
+      
+      setProperties(data);
+      
+      // Aguardar renderização e inicializar Swiper
+      if (typeof window === "undefined" || !swiperContainerRef.current) return;
+      
       await new Promise((resolve) => requestAnimationFrame(resolve));
+      if (!isMounted || !swiperContainerRef.current) return;
 
       const { default: Swiper } = await import("swiper");
+      if (!isMounted || !swiperContainerRef.current) return;
 
       // Destruir instância anterior se existir
-      if (swiperInstanceRef.current) {
-        swiperInstanceRef.current.destroy(true, true);
-        swiperInstanceRef.current = null;
-      }
+      swiperInstanceRef.current?.destroy(true, true);
 
-      if (!isMounted || !swiperContainerRef.current) {
-        return;
-      }
+      const propertiesWithImages = data.filter((p) => p.image);
+      if (propertiesWithImages.length === 0) return;
 
       swiperInstanceRef.current = new Swiper(swiperContainerRef.current, {
         modules: [Navigation, Pagination, Autoplay],
@@ -70,25 +55,25 @@ export default function CarrosselHero() {
           delay: 10000,
           disableOnInteraction: false,
         },
-        loop: properties.filter((p) => p.image).length > 1,
+        loop: propertiesWithImages.length > 1,
       });
     }
 
-    mountSwiper();
+    initSwiper();
 
     return () => {
       isMounted = false;
       swiperInstanceRef.current?.destroy(true, true);
       swiperInstanceRef.current = null;
     };
-  }, [properties]);
+  }, []);
 
   return (
     <section className={styles.sliderContainer}>
       <div ref={swiperContainerRef} className={`${styles.styledSwiper} swiper`}>
         <div className="swiper-wrapper">
           {properties
-            .filter((property) => property.image) // Filtra apenas propriedades com imagem
+            .filter((property) => property.image)
             .map((property) => (
               <div key={property.id} className="swiper-slide">
                 <div className={styles.slideImageContainer}>

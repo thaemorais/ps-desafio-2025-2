@@ -15,6 +15,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
   height: 100%;
   width: 100%;
 }
@@ -91,3 +92,14 @@
   color: #fff;
 }
 
+@media only screen and (max-width: 768px) {
+  .flexContainer {
+    justify-content: center !important;
+    flex-direction: column;
+    gap: 30px;
+    .footerCol2 {
+      align-items: center;
+      max-width: 60%;
+    }
+  }
+}

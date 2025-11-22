@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 
 import Footer from './_components/Footer'
-import Navbar from './_components/Navbar'
+import Header from './_components/Header'
 import CarrosselHero from './_components/CarrosselHero'
 import CardImovel from './_components/CardImovel'
 
@@ -37,8 +37,8 @@ export default function Home() {
 
   return (
     <>
-      <Navbar />
-      <main>
+      <Header />
+      <main className={styles.main}>
         <CarrosselHero />
         <BannerMiddle />
         <div className={styles.container}>

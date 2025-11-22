@@ -51,7 +51,7 @@ export function DialogCreateProperty({ children }: DialogCreatePropertyProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent>
+      <DialogContent className="max-h-[70vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Adicionar imóvel</DialogTitle>
           <DialogDescription>
@@ -59,9 +59,11 @@ export function DialogCreateProperty({ children }: DialogCreatePropertyProps) {
             &rdquo;Salvar&rdquo; para incluí-lo no sistema.
           </DialogDescription>
         </DialogHeader>
-        <form action={submit}>
-          <FormFieldsProperty error={error} />
-        </form>
+        <div className="overflow-y-auto flex-1 -mx-6 px-6">
+          <form action={submit}>
+            <FormFieldsProperty error={error} />
+          </form>
+        </div>
       </DialogContent>
     </Dialog>
   )

@@ -41,18 +41,14 @@ export default function FormFieldsProperty({
   const { pending } = useFormStatus()
   const [updateImage, setUpdateImage] = useState<string | undefined>()
   const [categories, setCategories] = useState<categoryType[]>([])
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string>(
-    property?.category_id ?? '',
-  )
-  const [acquired, setAcquired] = useState<boolean>(property?.acquired ?? false)
-  
-  // Estados para endereço
-  const [cep, setCep] = useState<string>('')
-  const [numero, setNumero] = useState<string>('')
-  const [complemento, setComplemento] = useState<string>('')
+  const [selectedCategoryId, setSelectedCategoryId] = useState(property?.category_id ?? '')
+  const [acquired, setAcquired] = useState(property?.acquired ?? false)
+  const [cep, setCep] = useState('')
+  const [numero, setNumero] = useState('')
+  const [complemento, setComplemento] = useState('')
   const [cepData, setCepData] = useState<CepResponse | null>(null)
   const [buscandoCep, setBuscandoCep] = useState(false)
-  const [enderecoCompleto, setEnderecoCompleto] = useState<string>('')
+  const [enderecoCompleto, setEnderecoCompleto] = useState('')
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -65,87 +61,41 @@ export default function FormFieldsProperty({
   }, [])
 
   useEffect(() => {
-    if (property?.category_id) {
-      setSelectedCategoryId(property.category_id)
-    }
-  }, [property?.category_id])
-
-  useEffect(() => {
-    if (property?.acquired !== undefined) {
-      setAcquired(property.acquired)
-    }
+    if (property?.acquired !== undefined) setAcquired(property.acquired)
   }, [property?.acquired])
 
-  // Extrai CEP, número e complemento do endereço existente ao editar
   useEffect(() => {
-    if (property?.address && !cep && !numero && !cepData) {
-      const dados = extrairDadosEndereco(property.address)
-      if (dados.cep) {
-        setCep(dados.cep)
-        // Busca os dados do CEP automaticamente
-        buscarCep(dados.cep)
-          .then((data) => {
-            if (data) {
-              setCepData(data)
-            }
-          })
-          .catch(() => {
-            // Ignora erros
-          })
-      }
-      if (dados.numero) {
-        setNumero(dados.numero)
-      }
-      if (dados.complemento) {
-        setComplemento(dados.complemento)
-      }
+    if (!property?.address || cep || cepData) return
+    
+    const dados = extrairDadosEndereco(property.address)
+    if (dados.cep) {
+      setCep(dados.cep)
+      buscarCep(dados.cep).then(setCepData).catch(() => {})
     }
-  }, [property?.address])
+    if (dados.numero) setNumero(dados.numero)
+    if (dados.complemento) setComplemento(dados.complemento)
+  }, [property?.address, cep, cepData])
 
-  // Busca CEP automaticamente quando o campo é preenchido
   useEffect(() => {
     const cepLimpo = cep.replace(/\D/g, '')
     
-    if (cepLimpo.length === 8) {
-      // Evita buscar novamente se já temos os dados para este CEP
-      const cepDataLimpo = cepData?.cep?.replace(/-/g, '')
-      if (cepDataLimpo === cepLimpo) {
-        return
-      }
-      
-      setBuscandoCep(true)
-      buscarCep(cepLimpo)
-        .then((data) => {
-          if (data) {
-            setCepData(data)
-          } else {
-            setCepData(null)
-          }
-        })
-        .catch(() => {
-          setCepData(null)
-        })
-        .finally(() => {
-          setBuscandoCep(false)
-        })
-    } else if (cepLimpo.length === 0) {
-      // Limpa os dados quando o CEP é removido
+    if (cepLimpo.length !== 8) {
       setCepData(null)
-      setEnderecoCompleto('')
-    } else {
-      setCepData(null)
+      if (!cepLimpo) setEnderecoCompleto('')
+      return
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cep])
 
-  // Monta o endereço completo quando CEP, número ou complemento mudam
+    if (cepData?.cep?.replace(/-/g, '') === cepLimpo) return
+
+    setBuscandoCep(true)
+    buscarCep(cepLimpo)
+      .then(setCepData)
+      .catch(() => setCepData(null))
+      .finally(() => setBuscandoCep(false))
+  }, [cep, cepData])
+
   useEffect(() => {
-    if (cepData) {
-      const endereco = formatarEndereco(cepData, numero, complemento)
-      setEnderecoCompleto(endereco)
-    } else {
-      setEnderecoCompleto('')
-    }
+    setEnderecoCompleto(cepData ? formatarEndereco(cepData, numero, complemento) : '')
   }, [cepData, numero, complemento])
 
   return (

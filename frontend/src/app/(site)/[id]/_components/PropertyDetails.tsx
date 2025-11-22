@@ -153,7 +153,7 @@ export default function PropertyDetails({
 
         <div className={styles.actions}>
           <Link href="/" className={styles.primaryLink}>Voltar para a lista</Link>
-          {!propertyAtual.acquired && (
+          {!propertyAtual.acquired ? (
             <button type="button" className={styles.secondaryButton} onClick={handleAdquirirImovel} disabled={isUpdating}>
               {isUpdating ? (
                 <>
@@ -164,7 +164,10 @@ export default function PropertyDetails({
                 'Adquirir imóvel'
               )}
             </button>
-          )}
+          ) : 
+            <button type="button" className={styles.secondaryButton} disabled>
+              Imóvel adquirido
+            </button>}
         </div>
       </section>
     </main>

@@ -71,7 +71,7 @@ export function DialogUpdateProperty({ id, children }: DialogUpdatePropertyProps
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent>
+      <DialogContent className="max-h-[70vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Editar imóvel</DialogTitle>
           <DialogDescription>
@@ -79,9 +79,11 @@ export function DialogUpdateProperty({ id, children }: DialogUpdatePropertyProps
             &quot;Salvar&quot; para aplicar as alterações.
           </DialogDescription>
         </DialogHeader>
-        <form action={submit}>
-          <FormFieldsProperty error={error} property={property} />
-        </form>
+        <div className="overflow-y-auto flex-1 -mx-6 px-6">
+          <form action={submit}>
+            <FormFieldsProperty error={error} property={property} />
+          </form>
+        </div>
       </DialogContent>
     </Dialog>
   )

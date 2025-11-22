@@ -1,9 +1,10 @@
 import { notFound } from 'next/navigation'
 
 import Footer from '@/app/(site)/_components/Footer'
-import Navbar from '@/app/(site)/_components/Navbar'
+import Header from '@/app/(site)/_components/Header'
 import { buscarImovelPorId } from '@/services/properties'
 import PropertyDetails from './_components/PropertyDetails'
+import styles from './page.module.css'
 
 type PaginaImovelProps = {
   params: Promise<{
@@ -23,8 +24,10 @@ export default async function PaginaImovel({ params }: PaginaImovelProps) {
 
     return (
       <>
-        <Navbar />
-        <PropertyDetails property={property} />
+        <Header />
+        <main className={styles.main}>
+          <PropertyDetails property={property} />
+        </main>
         <Footer />
       </>
     )
