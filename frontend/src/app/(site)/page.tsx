@@ -95,7 +95,7 @@ export default function Home() {
       <Header />
       <main className={styles.main}>
         <CarrosselHero />
-        <BannerMiddle />
+        <BannerMiddle urlImage="/assets/images/banner1.png"/>
         <div className={styles.container}>
           {isLoading ? (
             <div className={styles.loadingContainer}>
@@ -129,6 +129,7 @@ export default function Home() {
             </>
           )}
         </div>
+        <BannerMiddle urlImage="/assets/images/banner2.png"/>
       </main>
       <Footer />
     </>
