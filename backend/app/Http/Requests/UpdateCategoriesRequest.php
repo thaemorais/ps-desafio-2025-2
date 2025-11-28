@@ -27,4 +27,14 @@ class UpdateCategoriesRequest extends FormRequest
             'name' => "required|string|max:255|unique:categories,name,{$id}",
         ];
     }
+
+    public function messages()
+    {
+        return [
+            'name.required' => 'O campo NOME é obrigatório.',
+            'name.string' => 'O campo NOME deve ser um texto.',
+            'name.max' => 'O campo NOME no máximo 255 caracteres.',
+            'name.unique' => 'O campo NOME deve ser único.',
+        ];
+    }
 }

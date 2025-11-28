@@ -12,8 +12,9 @@ const roboto = Roboto({
 })
 
 export const metadata: Metadata = {
-  title: 'Adapti Project Template',
-  description: 'Created by Adapti 2025',
+  title: 'Thae Imóveis',
+  description: 'Created by Thae Morais',
+  icons: { icon: '/favicon.ico' },
 }
 
 export default async function RootLayout({

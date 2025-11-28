@@ -103,7 +103,7 @@ export default function FormFieldsProperty({
       <FormFieldsGroup>
         {property && <Input defaultValue={property.id} type="text" name="id" hidden />}
         <FormField>
-          <Label htmlFor="image" hidden={readOnly && !property?.image}>
+          <Label htmlFor="image" hidden={readOnly && !property?.image} required={!property}>
             Imagem
           </Label>
           <Input
@@ -185,7 +185,7 @@ export default function FormFieldsProperty({
               <SelectValue placeholder="Selecione uma categoria" />
             </SelectTrigger>
             <SelectContent>
-              {categories.map((category) => (
+              {[...categories].sort((a, b) => a.name.localeCompare(b.name)).map((category) => (
                 <SelectItem key={category.id} value={category.id}>
                   {category.name}
                 </SelectItem>
@@ -263,7 +263,7 @@ export default function FormFieldsProperty({
           />
         </FormField>
         <FormField>
-          <Label htmlFor="complemento">
+          <Label htmlFor="complemento"  required={!property}>
             Complemento
           </Label>
           <Input

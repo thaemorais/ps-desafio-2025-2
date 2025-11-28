@@ -11,7 +11,7 @@ import {
 
 import { categoryType } from '@/types/category'
 import { Button } from '@/components/button'
-import { LuInfo, LuPen, LuPlusCircle, LuTrash } from 'react-icons/lu'
+import { LuInfo, LuPen, LuCirclePlus, LuTrash } from 'react-icons/lu'
 import { DialogUpdateCategory } from './dialog-update-category'
 import { DialogCategoryDelete } from './dialog-delete-category'
 import { DialogInformationCategory } from './dialog-information-category'
@@ -33,7 +33,7 @@ export default async function ListCategory() {
         <DashboardContainer className="flex h-min justify-between space-x-0 gap-y-2.5 max-sm:flex-col">
           <DialogCreateCategory>
             <Button size="sm">
-              <LuPlusCircle />
+              <LuCirclePlus />
               Nova categoria
             </Button>
           </DialogCreateCategory>

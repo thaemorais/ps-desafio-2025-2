@@ -11,7 +11,7 @@ import {
 } from '@/components/dashboard/table'
 import { propertyType } from '@/types/property'
 import { Button } from '@/components/button'
-import { LuInfo, LuPen, LuPlusCircle, LuTrash } from 'react-icons/lu'
+import { LuInfo, LuPen, LuCirclePlus, LuTrash } from 'react-icons/lu'
 import { DialogUpdateProperty } from './dialog-update-property'
 import { DialogPropertyDelete } from './dialog-delete-property'
 import { DialogInformationProperty } from './dialog-information-property'
@@ -41,7 +41,7 @@ export default async function ListProperties() {
       <DashboardContainer className="flex h-min justify-between space-x-0 gap-y-2.5 max-sm:flex-col">
         <DialogCreateProperty>
           <Button size="sm">
-            <LuPlusCircle />
+            <LuCirclePlus />
             Novo imóvel
           </Button>
         </DialogCreateProperty>
