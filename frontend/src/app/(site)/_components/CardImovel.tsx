@@ -11,9 +11,11 @@ import styles from './CardImovel.module.css'
 
 type CardImovelProps = {
   property: propertyType
+  'data-aos'?: string
+  'data-aos-delay'?: number
 }
 
-export default function CardImovel({ property }: CardImovelProps) {
+export default function CardImovel({ property, 'data-aos': dataAos, 'data-aos-delay': dataAosDelay }: CardImovelProps) {
 
   const [category, setCategory] = useState<Category | null>(null)
   const [isLoadingCategory, setIsLoadingCategory] = useState(true)
@@ -29,7 +31,11 @@ export default function CardImovel({ property }: CardImovelProps) {
   }, [property.category_id])
 
   return (
-    <div className={styles.cardImovelContainer}>
+    <div 
+      className={styles.cardImovelContainer}
+      data-aos={dataAos}
+      data-aos-delay={dataAosDelay}
+    >
       <div 
         className={styles.cardImovelImage}
         style={{ backgroundImage: property.image ? `url(${property.image})` : undefined }}

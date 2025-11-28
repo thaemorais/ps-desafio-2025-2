@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useMemo } from 'react'
+import AOS from 'aos'
 
 import Footer from './_components/Footer'
 import Header from './_components/Header'
@@ -24,6 +25,16 @@ export default function Home() {
   })
 
   useEffect(() => {
+    // Inicializa o AOS
+    AOS.init({
+      duration: 800,
+      easing: 'ease-in-out',
+      once: true,
+      offset: 100,
+    })
+  }, [])
+
+  useEffect(() => {
     let isMounted = true
 
     async function loadProperties() {
@@ -32,6 +43,8 @@ export default function Home() {
       if (isMounted) {
         setProperties(data)
         setIsLoading(false)
+        // Re-inicializa o AOS após carregar os dados
+        AOS.refresh()
       }
     }
 
@@ -102,8 +115,14 @@ export default function Home() {
                 </div>
               ) : (
                 <div className={styles.gridCards}>
-                  {filteredProperties.map((property) => (
-                    <CardImovel key={property.id} property={property} />
+                  {filteredProperties.map((property, index) => (
+                    <CardImovel 
+                      key={property.id} 
+                      property={property}
+                      data-aos="zoom-in-up"
+                      data-aos-once="false"
+                      data-aos-delay={index * 300}
+                    />
                   ))}
                 </div>
               )}
