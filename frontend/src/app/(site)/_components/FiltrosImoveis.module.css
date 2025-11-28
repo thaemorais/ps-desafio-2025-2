@@ -1,0 +1,51 @@
+.filtrosContainer {
+  background: #fff;
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 32px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.filtrosTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #0b122c;
+}
+
+.filtrosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  align-items: end;
+}
+
+.filtroItem {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.clearButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  justify-content: center;
+}
+
+.clearIcon {
+  width: 16px;
+  height: 16px;
+}
+
+@media only screen and (max-width: 768px) {
+  .filtrosGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .filtrosContainer {
+    padding: 20px;
+  }
+}
+

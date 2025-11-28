@@ -55,6 +55,20 @@
   font-size: 0.95rem;
 }
 
+.emptyState {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 20px;
+  width: 100%;
+}
+
+.emptyStateText {
+  color: #4a4a4a;
+  font-size: 1.1rem;
+  text-align: center;
+}
+
 @media only screen and (max-width: 768px) {
   .gridCards {
     grid-template-columns: repeat( 1, 1fr);
